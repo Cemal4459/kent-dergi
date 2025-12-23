@@ -1,15 +1,39 @@
-// PDF.js ayarı
-const PDF_URL = new URL("assets/pdf/tekir-sayi-1.pdf", window.location.href).toString();
+// ===== PDF.js ayarı (Lokal + güvenli) =====
 
-const PDF_URL = new URL("assets/pdf/tekir-sayi-1.pdf", window.location.href).toString();
+// pdf.min.js gerçekten yüklenmiş mi?
+if (typeof pdfjsLib === "undefined") {
+  console.error("pdfjsLib bulunamadı. dergi.html içinde pdf.min.js yolu yanlış olabilir.");
+  alert("PDF sistemi yüklenemedi! (pdf.min.js bulunamadı)");
+}
 
+// Worker'ı lokalden göster (CDN yerine)
+try {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "assets/vendor/pdfjs/pdf.worker.min.js",
+    window.location.href
+  ).toString();
+} catch (e) {
+  console.warn("Worker yolu ayarlanamadı:", e);
+}
+
+// Worker kaynaklı sorunlarda kesin açılması için fallback:
+// (İstersen sorun çözülünce false yapabilirsin)
+pdfjsLib.disableWorker = true;
+
+// PDF yolu (GitHub Pages için güvenli)
+const PDF_URL = new URL(
+  "assets/pdf/tekir-sayi-1.pdf",
+  window.location.href
+).toString();
+
+// ===== Viewer state =====
 let pdfDoc = null;
 let pageNum = 1;
 let scale = 1.25;
 let rendering = false;
 
 const canvas = document.getElementById("pdfCanvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas?.getContext("2d");
 
 const pageInput = document.getElementById("pageInput");
 const pageCountEl = document.getElementById("pageCount");
@@ -26,8 +50,23 @@ const searchResult = document.getElementById("searchResult");
 
 const thumbList = document.getElementById("thumbList");
 
+function showErrorBox(msg) {
+  const wrap = document.querySelector(".canvas-wrap");
+  if (wrap) {
+    wrap.innerHTML = `
+      <div style="padding:16px; color:#fff;">
+        <div style="font-weight:800; margin-bottom:6px;">PDF yüklenemedi</div>
+        <div style="opacity:.85; font-size:.95rem;">${msg}</div>
+        <div style="margin-top:10px; opacity:.7; font-size:.85rem;">
+          F12 → Console hatasını bana atarsan hemen nokta atışı çözerim.
+        </div>
+      </div>
+    `;
+  }
+}
+
 async function renderPage(num) {
-  if (!pdfDoc || rendering) return;
+  if (!pdfDoc || rendering || !canvas || !ctx) return;
   rendering = true;
 
   const page = await pdfDoc.getPage(num);
@@ -40,7 +79,7 @@ async function renderPage(num) {
   await page.render(renderContext).promise;
 
   pageNum = num;
-  pageInput.value = pageNum;
+  if (pageInput) pageInput.value = pageNum;
   rendering = false;
 }
 
@@ -55,7 +94,6 @@ async function buildThumbs() {
   thumbList.innerHTML = "";
   const max = pdfDoc.numPages;
 
-  // Çok ağır olmasın diye sadece text tabanlı hızlı liste yapıyoruz
   for (let i = 1; i <= max; i++) {
     const el = document.createElement("div");
     el.className = "thumb";
@@ -69,21 +107,33 @@ async function buildThumbs() {
 }
 
 async function init() {
-  const loadingTask = pdfjsLib.getDocument(PDF_URL);
+  if (!canvas || !ctx) {
+    showErrorBox("Canvas bulunamadı (#pdfCanvas). dergi.html içindeki id'leri kontrol et.");
+    return;
+  }
+
+  // PDF'i yükle
+  const loadingTask = pdfjsLib.getDocument({
+    url: PDF_URL,
+    // bazen CORS/encoding sorunlarında iş görür:
+    withCredentials: false,
+  });
+
   pdfDoc = await loadingTask.promise;
 
-  pageCountEl.textContent = `/ ${pdfDoc.numPages}`;
-  pageInput.max = pdfDoc.numPages;
+  if (pageCountEl) pageCountEl.textContent = `/ ${pdfDoc.numPages}`;
+  if (pageInput) pageInput.max = pdfDoc.numPages;
 
   await buildThumbs();
   await renderPage(1);
 }
 
+// ===== Events =====
 prevBtn?.addEventListener("click", () => renderPage(clampPage(pageNum - 1)));
 nextBtn?.addEventListener("click", () => renderPage(clampPage(pageNum + 1)));
 
 goBtn?.addEventListener("click", () => {
-  const n = clampPage(parseInt(pageInput.value || "1", 10));
+  const n = clampPage(parseInt(pageInput?.value || "1", 10));
   renderPage(n);
 });
 
@@ -104,16 +154,17 @@ zoomOut?.addEventListener("click", () => {
   renderPage(pageNum);
 });
 
-// Basit arama: PDF içindeki metinlerde kelimeyi arar, eşleşen sayfaları listeler
+// ===== Search (basit metin arama) =====
 async function searchInPdf(query) {
   if (!pdfDoc) return;
+
   const q = (query || "").trim().toLowerCase();
   if (!q) {
-    searchResult.textContent = "Aranacak kelime yaz.";
+    if (searchResult) searchResult.textContent = "Aranacak kelime yaz.";
     return;
   }
 
-  searchResult.textContent = "Aranıyor…";
+  if (searchResult) searchResult.textContent = "Aranıyor…";
   const hits = [];
 
   for (let i = 1; i <= pdfDoc.numPages; i++) {
@@ -121,15 +172,15 @@ async function searchInPdf(query) {
     const textContent = await page.getTextContent();
     const text = textContent.items.map(it => it.str).join(" ").toLowerCase();
     if (text.includes(q)) hits.push(i);
-    // performans için çok uzun pdflerde burada break / throttle eklenebilir
   }
+
+  if (!searchResult) return;
 
   if (hits.length === 0) {
     searchResult.textContent = `“${query}” bulunamadı.`;
     return;
   }
 
-  // Sonuçları tıklanabilir yap
   searchResult.innerHTML = `Bulundu: ${hits
     .slice(0, 12)
     .map(p => `<button class="linklike" data-p="${p}">${p}</button>`)
@@ -143,28 +194,18 @@ async function searchInPdf(query) {
   });
 }
 
-searchBtn?.addEventListener("click", () => searchInPdf(searchInput.value));
+searchBtn?.addEventListener("click", () => searchInPdf(searchInput?.value));
 searchInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") searchInPdf(searchInput.value);
 });
 
+// ===== Init =====
 init().catch(err => {
   console.error("PDF init error:", err);
-
-  const wrap = document.querySelector(".canvas-wrap");
-  if (wrap) {
-    wrap.innerHTML = `
-      <div style="padding:16px; color:#fff;">
-        <div style="font-weight:800; margin-bottom:6px;">PDF yüklenemedi</div>
-        <div style="opacity:.8; font-size:.95rem;">
-          Dosya yolu / worker / CDN hatası olabilir.
-        </div>
-        <div style="margin-top:10px; opacity:.7; font-size:.85rem;">
-          Konsolu (F12) aç → Console’daki hatayı bana at.
-        </div>
-      </div>
-    `;
-  }
+  showErrorBox(
+    `Hata: <span style="opacity:.9">${String(err?.message || err)}</span><br>
+     <span style="opacity:.8">Kontrol: PDF_URL → ${PDF_URL}</span>`
+  );
 });
 
 // küçük CSS helper (buton görünümü)
@@ -180,6 +221,9 @@ style.textContent = `
     cursor:pointer;
     font-weight:700;
   }
-  .linklike:hover{border-color: rgba(255,255,255,.26); transform: translateY(-1px);}
+  .linklike:hover{
+    border-color: rgba(255,255,255,.26);
+    transform: translateY(-1px);
+  }
 `;
 document.head.appendChild(style);
