@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TEKİR — Dergiyi Oku</title>
+  <link rel="icon" href="assets/img/favicon.png" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- PDF.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.js"></script>
+</head>
+<body class="viewer-body">
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="noise"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img class="brand-logo" src="assets/img/logo.png" alt="Logo">
+        <div class="brand-text">
+          <div class="brand-title">TEKİR</div>
+          <div class="brand-sub">Dergiyi Oku</div>
+        </div>
+      </a>
+
+      <nav class="nav">
+        <a href="index.html#sayilar">Sayılar</a>
+        <a href="hakkinda.html">Hakkında</a>
+        <a href="kulup.html">Kulüp</a>
+        <a class="btn btn-ghost" href="assets/pdf/tekir-sayi-1.pdf" target="_blank" rel="noopener">PDF</a>
+      </nav>
+
+      <button class="nav-toggle" aria-label="Menüyü aç" data-nav-toggle>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-nav" data-mobile-nav>
+      <a href="index.html#sayilar">Sayılar</a>
+      <a href="hakkinda.html">Hakkında</a>
+      <a href="kulup.html">Kulüp</a>
+      <a href="assets/pdf/tekir-sayi-1.pdf" target="_blank" rel="noopener">PDF</a>
+    </div>
+  </header>
+
+  <main class="viewer">
+    <div class="container">
+      <div class="viewer-top">
+        <div class="viewer-title">
+          <h1>TEKİR • Sayı 1</h1>
+          <p class="muted">Ekim — Kasım • 2025–2026</p>
+        </div>
+
+        <div class="viewer-controls">
+          <button class="btn btn-ghost" id="prevBtn">◀</button>
+          <button class="btn btn-ghost" id="nextBtn">▶</button>
+
+          <div class="ctrl">
+            <span class="muted small">Sayfa</span>
+            <input id="pageInput" type="number" min="1" value="1" />
+            <span class="muted small" id="pageCount">/ ?</span>
+            <button class="btn btn-soft" id="goBtn">Git</button>
+          </div>
+
+          <div class="ctrl">
+            <button class="btn btn-ghost" id="zoomOut">−</button>
+            <button class="btn btn-ghost" id="zoomIn">+</button>
+          </div>
+
+          <a class="btn btn-primary" href="assets/pdf/tekir-sayi-1.pdf" download>İndir</a>
+        </div>
+      </div>
+
+      <div class="viewer-search">
+        <input id="searchInput" placeholder="Dergide ara (ör: Atatürk, Cumhuriyet, LÖSEV…)" />
+        <button class="btn btn-soft" id="searchBtn">Ara</button>
+        <div class="muted small" id="searchResult"></div>
+      </div>
+
+      <div class="viewer-stage">
+        <div class="canvas-wrap">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
+
+        <aside class="thumbs">
+          <div class="thumbs-head">
+            <div class="muted small">Hızlı Geçiş</div>
+          </div>
+          <div id="thumbList" class="thumb-list"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/viewer.js"></script>
+</body>
+</html>
