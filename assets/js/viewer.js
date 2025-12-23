@@ -1,3 +1,12 @@
+// DEBUG: Script çalışıyor mu?
+(function(){
+  const d = document.createElement("div");
+  d.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:99999;background:#111;padding:8px 10px;border:1px solid #444;border-radius:10px;color:#fff;font:12px/1.2 Inter,system-ui;opacity:.9";
+  d.id = "dbg";
+  d.textContent = "viewer.js LOADED ✅";
+  document.body.appendChild(d);
+})();
+
 // ===== PDF.js ayarı (Lokal + güvenli) =====
 
 // pdf.min.js gerçekten yüklenmiş mi?
