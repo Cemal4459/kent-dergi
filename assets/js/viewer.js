@@ -150,8 +150,22 @@ searchInput?.addEventListener("keydown", (e) => {
 });
 
 init().catch(err => {
-  console.error(err);
-  if (searchResult) searchResult.textContent = "PDF yüklenemedi. Dosya yolu doğru mu?";
+  console.error("PDF init error:", err);
+
+  const wrap = document.querySelector(".canvas-wrap");
+  if (wrap) {
+    wrap.innerHTML = `
+      <div style="padding:16px; color:#fff;">
+        <div style="font-weight:800; margin-bottom:6px;">PDF yüklenemedi</div>
+        <div style="opacity:.8; font-size:.95rem;">
+          Dosya yolu / worker / CDN hatası olabilir.
+        </div>
+        <div style="margin-top:10px; opacity:.7; font-size:.85rem;">
+          Konsolu (F12) aç → Console’daki hatayı bana at.
+        </div>
+      </div>
+    `;
+  }
 });
 
 // küçük CSS helper (buton görünümü)
