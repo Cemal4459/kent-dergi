@@ -1,6 +1,5 @@
 // PDF.js ayarı
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.js";
+const PDF_URL = new URL("assets/pdf/tekir-sayi-1.pdf", window.location.href).toString();
 
 const PDF_URL = new URL("assets/pdf/tekir-sayi-1.pdf", window.location.href).toString();
 
