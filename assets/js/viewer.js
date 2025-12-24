@@ -39,6 +39,7 @@ const PDF_URL = new URL(
 let pdfDoc = null;
 let pageNum = 1;
 let scale = 1.25;
+let savedScale = null;
 let rendering = false;
 
 const canvas = document.getElementById("pdfCanvas");
@@ -95,6 +96,23 @@ async function renderPage(num) {
   if (pageInput) pageInput.value = pageNum;
   rendering = false;
 }
+function fitToScreen(num = pageNum) {
+  if (!pdfDoc || !canvasWrap) return;
+
+  const wrapRect = canvasWrap.getBoundingClientRect();
+
+  pdfDoc.getPage(num).then(page => {
+    const unscaled = page.getViewport({ scale: 1 });
+
+    const sx = (wrapRect.width - 24) / unscaled.width;
+    const sy = (wrapRect.height - 24) / unscaled.height;
+
+    // scale'i makul aralıkta tut
+    scale = Math.max(0.6, Math.min(2.2, Math.min(sx, sy)));
+    renderPage(num);
+  });
+}
+
 
 function clampPage(n) {
   if (!pdfDoc) return 1;
