@@ -204,4 +204,46 @@ window.addEventListener("resize", () => {
     fitToScreen(pageNum);
   }
 });
+// ================= SWIPE (Touch + Mouse) =================
+let startX = 0;
+let isDown = false;
+
+const SWIPE_THRESHOLD = 60; // px
+
+canvasWrap.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+}, { passive: true });
+
+canvasWrap.addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = endX - startX;
+
+  if (Math.abs(diff) > SWIPE_THRESHOLD) {
+    if (diff > 0) {
+      renderPage(clampPage(pageNum - 1)); // sağa → önceki
+    } else {
+      renderPage(clampPage(pageNum + 1)); // sola → sonraki
+    }
+  }
+});
+
+// PC mouse desteği
+canvasWrap.addEventListener("mousedown", e => {
+  isDown = true;
+  startX = e.clientX;
+});
+
+window.addEventListener("mouseup", e => {
+  if (!isDown) return;
+  isDown = false;
+
+  const diff = e.clientX - startX;
+  if (Math.abs(diff) > SWIPE_THRESHOLD) {
+    if (diff > 0) {
+      renderPage(clampPage(pageNum - 1));
+    } else {
+      renderPage(clampPage(pageNum + 1));
+    }
+  }
+});
 
