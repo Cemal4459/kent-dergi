@@ -418,3 +418,50 @@ body{
   .issues-grid{grid-template-columns:1fr}
   .brand-sub{display:none}
 }
+/* ===== Fullscreen okuma modu (mobil için) ===== */
+.canvas-wrap{
+  position: relative; /* fs butonları için */
+}
+
+.fs-nav{
+  display: none; /* sadece fullscreen'de açacağız */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+
+  width: 56px;
+  height: 120px;
+  border-radius: 18px;
+
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.28);
+  color: #fff;
+  font-size: 44px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.fs-left{ left: 10px; }
+.fs-right{ right: 10px; }
+
+/* Fullscreen modundayken canvas-wrap büyüsün ve tuşlar görünsün */
+.canvas-wrap.is-fullscreen{
+  padding: 10px;
+}
+
+.canvas-wrap.is-fullscreen .fs-nav{
+  display: block;
+}
+
+/* iPhone/telefonlarda daha kolay dokunma */
+@media (max-width: 740px){
+  .fs-nav{
+    width: 64px;
+    height: 140px;
+    font-size: 52px;
+    opacity: .95;
+  }
+}
+
