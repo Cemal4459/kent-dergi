@@ -3,7 +3,6 @@
   const d = document.createElement("div");
   d.style.cssText =
     "position:fixed;left:10px;bottom:10px;z-index:99999;background:#111;padding:8px 10px;border:1px solid #444;border-radius:10px;color:#fff;font:12px/1.2 Inter,system-ui;opacity:.9";
-  d.id = "dbg";
   d.textContent = "viewer.js LOADED ✅";
   document.body.appendChild(d);
 })();
@@ -16,7 +15,7 @@ if (typeof pdfjsLib === "undefined") {
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   new URL("assets/vendor/pdfjs/pdf.worker.min.js", window.location.href).toString();
 
-// iOS + GitHub Pages güvenliği
+// iOS + GitHub Pages uyumu
 pdfjsLib.disableWorker = true;
 
 const PDF_URL = new URL(
@@ -65,8 +64,8 @@ async function renderPage(num){
   const page = await pdfDoc.getPage(num);
   const viewport = page.getViewport({ scale });
 
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
+  canvas.width = Math.floor(viewport.width);
+  canvas.height = Math.floor(viewport.height);
 
   await page.render({ canvasContext: ctx, viewport }).promise;
 
@@ -75,14 +74,17 @@ async function renderPage(num){
   rendering = false;
 }
 
-// ===== FIT TO SCREEN (ANA ÇÖZÜM) =====
+// ===== FIT TO SCREEN (ASIL OLAY) =====
 function fitToScreen(num = pageNum){
+  if (!pdfDoc || !canvasWrap) return;
+
   const rect = canvasWrap.getBoundingClientRect();
 
   pdfDoc.getPage(num).then(page => {
     const base = page.getViewport({ scale: 1 });
     const sx = (rect.width - 24) / base.width;
     const sy = (rect.height - 24) / base.height;
+
     scale = Math.max(0.6, Math.min(2.2, Math.min(sx, sy)));
     renderPage(num);
   });
@@ -127,42 +129,45 @@ zoomOut.onclick = () => {
 fsPrev.onclick = () => renderPage(clampPage(pageNum - 1));
 fsNext.onclick = () => renderPage(clampPage(pageNum + 1));
 
-// ===== FULLSCREEN (TEK VE DOĞRU) =====
+// ===== FULLSCREEN (TEK ve TEMİZ) =====
 fsBtn.onclick = async () => {
-  const canFS = !!canvasWrap.requestFullscreen;
+  if (!canvasWrap) return;
 
   // AÇ
-  if (!document.fullscreenElement && !canvasWrap.classList.contains("is-fullscreen")) {
+  if (!document.fullscreenElement) {
     savedScale = scale;
     document.body.classList.add("fullscreen-ui");
 
-    if (canFS) {
-      try {
-        await canvasWrap.requestFullscreen();
-      } catch {}
+    try {
+      await canvasWrap.requestFullscreen();
+    } catch {
+      // iOS / destek yok
+      canvasWrap.classList.add("is-fullscreen");
     }
+
     canvasWrap.classList.add("is-fullscreen");
-    setTimeout(() => fitToScreen(), 150);
+
+    // ⬅️ PC’de tam sığdıran kritik satır
+    setTimeout(() => fitToScreen(pageNum), 120);
     return;
   }
 
   // KAPAT
-  if (document.fullscreenElement) await document.exitFullscreen();
+  await document.exitFullscreen();
   canvasWrap.classList.remove("is-fullscreen");
   document.body.classList.remove("fullscreen-ui");
 
-  scale = savedScale ?? scale;
-  renderPage(pageNum);
+  if (savedScale !== null) {
+    scale = savedScale;
+    savedScale = null;
+    renderPage(pageNum);
+  }
 };
 
-document.addEventListener("fullscreenchange", () => {
-  if (document.fullscreenElement) {
-    canvasWrap.classList.add("is-fullscreen");
-    document.body.classList.add("fullscreen-ui");
-    setTimeout(() => fitToScreen(), 150);
-  } else {
-    canvasWrap.classList.remove("is-fullscreen");
-    document.body.classList.remove("fullscreen-ui");
+// Pencere boyutu değişirse tekrar sığdır
+window.addEventListener("resize", () => {
+  if (canvasWrap.classList.contains("is-fullscreen")) {
+    fitToScreen(pageNum);
   }
 });
 
@@ -185,13 +190,12 @@ searchBtn.onclick = async () => {
 
 // ================= START =================
 init();
+
 // PC'de Ctrl + Mouse Wheel ile tarayıcı zoomunu engelle
 window.addEventListener(
   "wheel",
   (e) => {
-    if (e.ctrlKey) {
-      e.preventDefault();
-    }
+    if (e.ctrlKey) e.preventDefault();
   },
   { passive: false }
 );
