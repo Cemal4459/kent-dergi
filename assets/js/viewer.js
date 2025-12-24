@@ -240,3 +240,20 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+function toggleFullscreen() {
+  if (!canvasWrap) return;
+
+  if (!document.fullscreenElement) {
+    // Tam ekrana gir
+    canvasWrap.requestFullscreen().then(() => {
+      canvasWrap.classList.add("is-fullscreen");
+    }).catch(() => {
+      // iOS Safari fallback
+      canvasWrap.classList.toggle("is-fullscreen");
+    });
+  } else {
+    // Tam ekrandan çık
+    document.exitFullscreen();
+    canvasWrap.classList.remove("is-fullscreen");
+  }
+}
