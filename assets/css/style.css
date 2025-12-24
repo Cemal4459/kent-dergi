@@ -495,3 +495,13 @@ body.fullscreen-ui .topbar,
 body.fullscreen-ui nav{
   display: none !important;
 }
+/* Fullscreen modunda oklar sabit kalsın */
+.canvas-wrap.is-fullscreen .fs-nav{
+  transform: translateY(-50%) scale(0.85);
+}
+
+@media (max-width: 740px){
+  .canvas-wrap.is-fullscreen .fs-nav{
+    transform: translateY(-50%) scale(1);
+  }
+}
