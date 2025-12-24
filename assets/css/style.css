@@ -535,3 +535,15 @@ body.fullscreen-ui nav{
 .hero-grid > :nth-child(2){
   display: none !important;
 }
+/* === VIEWER ÜST BAR TEMİZLEME === */
+
+/* Soldaki üst "İndir" butonu */
+.viewer-controls > a.btn-primary:first-child{
+  display: none !important;
+}
+
+/* Sayfa numarasının yanındaki - / + zoom butonları */
+.viewer-controls .ctrl:last-of-type{
+  display: none !important;
+}
+
