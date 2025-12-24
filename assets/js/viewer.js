@@ -199,3 +199,9 @@ window.addEventListener(
   },
   { passive: false }
 );
+window.addEventListener("resize", () => {
+  if (canvasWrap?.classList.contains("is-fullscreen")) {
+    fitToScreen(pageNum);
+  }
+});
+
