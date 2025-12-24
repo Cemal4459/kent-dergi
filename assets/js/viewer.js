@@ -144,6 +144,13 @@ async function init() {
 // ===== Events =====
 prevBtn?.addEventListener("click", () => renderPage(clampPage(pageNum - 1)));
 nextBtn?.addEventListener("click", () => renderPage(clampPage(pageNum + 1)));
+fsPrev?.addEventListener("click", () => {
+  renderPage(clampPage(pageNum - 1));
+});
+
+fsNext?.addEventListener("click", () => {
+  renderPage(clampPage(pageNum + 1));
+});
 
 goBtn?.addEventListener("click", () => {
   const n = clampPage(parseInt(pageInput?.value || "1", 10));
