@@ -49,6 +49,10 @@ const pageCountEl = document.getElementById("pageCount");
 
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
+const fsBtn = document.getElementById("fsBtn");
+const fsPrev = document.getElementById("fsPrev");
+const fsNext = document.getElementById("fsNext");
+const canvasWrap = document.querySelector(".canvas-wrap");
 const goBtn = document.getElementById("goBtn");
 const zoomIn = document.getElementById("zoomIn");
 const zoomOut = document.getElementById("zoomOut");
