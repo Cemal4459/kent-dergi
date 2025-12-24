@@ -61,6 +61,12 @@ async function renderPage(num){
   if (!pdfDoc || rendering) return;
   rendering = true;
 
+  // 🔄 LOADING OVERLAY
+  const loading = document.createElement("div");
+  loading.className = "pdf-loading";
+  loading.innerHTML = `<div class="spinner"></div>`;
+  canvasWrap.appendChild(loading);
+
   const page = await pdfDoc.getPage(num);
   const viewport = page.getViewport({ scale });
 
@@ -68,6 +74,9 @@ async function renderPage(num){
   canvas.height = Math.floor(viewport.height);
 
   await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // ✅ LOADING KALKAR
+  loading.remove();
 
   pageNum = num;
   pageInput.value = num;
