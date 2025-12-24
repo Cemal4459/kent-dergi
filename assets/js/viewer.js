@@ -185,3 +185,13 @@ searchBtn.onclick = async () => {
 
 // ================= START =================
 init();
+// PC'de Ctrl + Mouse Wheel ile tarayıcı zoomunu engelle
+window.addEventListener(
+  "wheel",
+  (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+    }
+  },
+  { passive: false }
+);
