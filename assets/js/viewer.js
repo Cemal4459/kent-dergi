@@ -144,6 +144,9 @@ async function init() {
 // ===== Events =====
 prevBtn?.addEventListener("click", () => renderPage(clampPage(pageNum - 1)));
 nextBtn?.addEventListener("click", () => renderPage(clampPage(pageNum + 1)));
+fsBtn?.addEventListener("click", () => {
+  toggleFullscreen();
+});
 fsPrev?.addEventListener("click", () => {
   renderPage(clampPage(pageNum - 1));
 });
@@ -264,3 +267,12 @@ function toggleFullscreen() {
     canvasWrap.classList.remove("is-fullscreen");
   }
 }
+document.addEventListener("fullscreenchange", () => {
+  if (!canvasWrap) return;
+
+  if (document.fullscreenElement) {
+    canvasWrap.classList.add("is-fullscreen");
+  } else {
+    canvasWrap.classList.remove("is-fullscreen");
+  }
+});
