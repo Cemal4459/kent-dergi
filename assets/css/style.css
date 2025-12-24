@@ -546,4 +546,8 @@ body.fullscreen-ui nav{
 .viewer-controls .ctrl:last-of-type{
   display: none !important;
 }
+/* Viewer üstündeki SOL "İndir" */
+#dlTop { display: none !important; }
 
+/* Zoom - / + butonları */
+#zoomOut, #zoomIn { display: none !important; }
