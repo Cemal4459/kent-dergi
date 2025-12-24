@@ -527,3 +527,11 @@ body.fullscreen-ui nav{
 @keyframes spin{
   to{ transform: rotate(360deg); }
 }
+
+.hero-badges{
+  display: none !important;
+}
+
+.hero-grid > :nth-child(2){
+  display: none !important;
+}
