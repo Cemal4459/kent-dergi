@@ -465,3 +465,26 @@ body{
   }
 }
 
+/* ===== Fullscreen-like mod (mobil + pc) ===== */
+.canvas-wrap.is-fullscreen{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0b0c10;
+  padding: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.canvas-wrap.is-fullscreen canvas{
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 16px;
+}
+
+/* Tam ekran modunda üst navbar/menü gizlensin (silmeden) */
+body.fullscreen-ui header,
+body.fullscreen-ui .topbar,
+body.fullscreen-ui nav{
+  display: none !important;
+}
