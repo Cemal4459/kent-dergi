@@ -18,10 +18,15 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 // iOS + GitHub Pages uyumu
 pdfjsLib.disableWorker = true;
 
-const PDF_URL = new URL(
-  "assets/pdf/tekir-sayi-1.pdf",
-  window.location.href
-).toString();
+const PDF_URL = window.location.pathname.includes("dergi2.html")
+  ? new URL(
+      "assets/pdf/tekir-sayi-2.pdf",
+      window.location.href
+    ).toString()
+  : new URL(
+      "assets/pdf/tekir-sayi-1.pdf",
+      window.location.href
+    ).toString();
 
 // ================= STATE =================
 let pdfDoc = null;
